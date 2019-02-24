@@ -68,7 +68,7 @@
                         android:layout_height="25sp"
                         android:text="h264"
                         android:id="@+id/externalEncodeH264"
-                        android:checked="false"
+                        android:checked="true"
                         />
 
                 </LinearLayout>
@@ -154,7 +154,7 @@
                         android:layout_height="25sp"
                         android:text="h264"
                         android:id="@+id/internalEncodeH264"
-                        android:checked="false"
+                        android:checked="true"
                         />
 
                 </LinearLayout>

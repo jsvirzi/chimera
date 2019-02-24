@@ -154,6 +154,13 @@ public class Chimera extends AppCompatActivity {
         externalConfigurationParameters = new ConfigurationParameters();
         internalConfigurationParameters = new ConfigurationParameters();
 
+        context = getApplicationContext();
+        externalConfigurationParameters.context = context;
+        internalConfigurationParameters.context = context;
+
+        externalConfigurationParameters.frameRate = 30;
+        internalConfigurationParameters.frameRate = 30;
+
         outputDirectory = getFilesDir().getAbsolutePath();
         String outputFilename = String.format("%s/sensor_data.csv", outputDirectory);
         final DataLogger dataLogger = DataLogger.getInstance(outputFilename);
@@ -216,6 +223,7 @@ public class Chimera extends AppCompatActivity {
                         configurationParameters.context = context;
                         configurationParameters.activity = activity;
                         configurationParameters.useEncoder = checkBoxRecord.isChecked();
+                        configurationParameters.isExternal = true;
 
                         if (configurationParameters.useEncoder) {
                             configurationParameters.videoOutputDirectory = outputDirectory;
@@ -314,6 +322,7 @@ public class Chimera extends AppCompatActivity {
                         configurationParameters.context = context;
                         configurationParameters.activity = activity;
                         configurationParameters.useEncoder = checkBoxRecord.isChecked();
+                        configurationParameters.isExternal = false;
 
                         if (configurationParameters.useEncoder) {
                             configurationParameters.videoOutputDirectory = outputDirectory;
@@ -478,10 +487,10 @@ public class Chimera extends AppCompatActivity {
     }
 
     final int MY_REQUEST_CODE = 0;
-    @TargetApi(Build.VERSION_CODES.M)
+    @TargetApi(Build.VERSION_CODES.O)
     private void checkPermissions() {
         int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-        if (currentapiVersion >= Build.VERSION_CODES.M) {
+        if (currentapiVersion >= Build.VERSION_CODES.O) {
             boolean cameraOk = checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED;
             boolean sdOk = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
             String[] permissions = {
@@ -504,7 +513,7 @@ public class Chimera extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case MY_REQUEST_CODE:
-                if (grantResults != null && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults != null && (grantResults.length > 0) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "Camera/SD access granted");
                 }
                 break;

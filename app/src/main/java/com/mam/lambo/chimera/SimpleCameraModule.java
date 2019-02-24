@@ -61,6 +61,9 @@ public class SimpleCameraModule {
         context = configurationParameters.context;
         deviceName = configurationParameters.deviceName;
         surfaceDisp = configurationParameters.displaySurface;
+        if (configurationParameters.deviceId == null) {
+            configurationParameters.deviceId = configurationParameters.isExternal ? DeviceIdExternal : DeviceIdInternal;
+        }
         deviceId = configurationParameters.deviceId;
 
         String threadName;
@@ -78,8 +81,8 @@ public class SimpleCameraModule {
         boolean frameRateOk = false;
         Range<Integer>[] ranges = getSupportedFrameRates();
         for (Range<Integer> range : ranges) {
-            boolean lowerOk = (range.getLower() == configurationParameters.frameRate);
-            boolean upperOk = (range.getUpper() == configurationParameters.frameRate);
+            boolean lowerOk = (range.getLower() <= configurationParameters.frameRate);
+            boolean upperOk = (range.getUpper() >= configurationParameters.frameRate);
             if (lowerOk && upperOk) {
                 frameRateOk = true;
                 fpsRange = range;
