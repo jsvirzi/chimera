@@ -78,6 +78,15 @@ public class SimpleCameraModule {
 
         CameraManager cameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
 
+        String[] cameraIdList = null;
+        try {
+            cameraIdList = cameraManager.getCameraIdList();
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+
+        Log.d(TAG, String.format(Common.LOCALE, "length = %d - %s %s", cameraIdList.length, cameraIdList[0], cameraIdList[1]));
+
         boolean frameRateOk = false;
         Range<Integer>[] ranges = getSupportedFrameRates();
         for (Range<Integer> range : ranges) {
@@ -95,7 +104,7 @@ public class SimpleCameraModule {
         effectModes = getSupportedEffectModes();
 
         if (frameRateOk == true) {
-            fpsRange = ranges[ranges.length-1];
+//            fpsRange = ranges[ranges.length-1];
             String msg = String.format(Common.LOCALE, "requested frame rate modified to (%d,%d) fps",
                     fpsRange.getLower().intValue(), fpsRange.getUpper().intValue());
             Log.d(TAG, msg);
