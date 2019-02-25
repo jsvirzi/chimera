@@ -34,11 +34,9 @@ public class ConfigurationParameters implements Cloneable {
     public int bitRate;
     public int keyFrameInterval;
     public Activity activity;
-    public boolean useAlgo;
     public CustomSurfaceView overlayView;
     public CustomSurfaceView oppositeOverlayView;
     public boolean useEncoder;
-    public boolean useAttentionDeficit;
     public int keyFramesPerFile;
     public JpegSurface jpegSurface;
     public H264Surface h264Surface;
@@ -50,8 +48,6 @@ public class ConfigurationParameters implements Cloneable {
         displaySurface = null;
         overlayView = null;
         oppositeOverlayView = null;
-        useAlgo = false;
-        useAttentionDeficit = false;
         nightMode = false;
     }
 
@@ -61,8 +57,6 @@ public class ConfigurationParameters implements Cloneable {
         displaySurface = null;
         overlayView = null;
         oppositeOverlayView = null;
-        useAlgo = false;
-        useAttentionDeficit = false;
 
         /* from input parameters */
         this.deviceId = deviceId;

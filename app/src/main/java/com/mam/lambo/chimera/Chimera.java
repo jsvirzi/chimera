@@ -151,15 +151,33 @@ public class Chimera extends AppCompatActivity {
         chimera = this;
         activity = this;
 
-        externalConfigurationParameters = new ConfigurationParameters();
-        internalConfigurationParameters = new ConfigurationParameters();
+//        externalConfigurationParameters = new ConfigurationParameters();
+//        internalConfigurationParameters = new ConfigurationParameters();
 
         context = getApplicationContext();
+        try {
+            externalConfigurationParameters = (ConfigurationParameters) ConfigurationParameters.DEFAULT_EXTERNAL_CONFIGURATION_HD.clone();
+        } catch (CloneNotSupportedException ex) {
+            ex.printStackTrace();
+        }
         externalConfigurationParameters.context = context;
-        internalConfigurationParameters.context = context;
+        externalConfigurationParameters.frameRate = 15;
+        externalConfigurationParameters.imageWidth = 1280;
+        externalConfigurationParameters.imageHeight = 720;
+        externalConfigurationParameters.isExternal = true;
+        externalConfigurationParameters.activity = activity;
 
-        externalConfigurationParameters.frameRate = 30;
-        internalConfigurationParameters.frameRate = 30;
+        try {
+            internalConfigurationParameters = (ConfigurationParameters) ConfigurationParameters.DEFAULT_INTERNAL_CONFIGURATION_HD.clone();
+        } catch (CloneNotSupportedException ex) {
+            ex.printStackTrace();
+        }
+        internalConfigurationParameters.context = context;
+        internalConfigurationParameters.frameRate = 15;
+        internalConfigurationParameters.imageWidth = 1280;
+        internalConfigurationParameters.imageHeight = 720;
+        internalConfigurationParameters.isExternal = false;
+        internalConfigurationParameters.activity = activity;
 
         outputDirectory = getFilesDir().getAbsolutePath();
         String outputFilename = String.format("%s/sensor_data.csv", outputDirectory);
@@ -220,10 +238,7 @@ public class Chimera extends AppCompatActivity {
                     if (checkBoxExternalVideo.isChecked()) {
 
                         ConfigurationParameters configurationParameters = externalConfigurationParameters;
-                        configurationParameters.context = context;
-                        configurationParameters.activity = activity;
                         configurationParameters.useEncoder = checkBoxRecord.isChecked();
-                        configurationParameters.isExternal = true;
 
                         if (configurationParameters.useEncoder) {
                             configurationParameters.videoOutputDirectory = outputDirectory;
@@ -235,7 +250,6 @@ public class Chimera extends AppCompatActivity {
                                 configurationParameters.videoOutputFile = String.format("%s/%s_video.mp4",
                                         outputDirectory, configurationParameters.deviceName);
                             }
-//                            configurationParameters.imageHeight = 1088; // TODO
                             configurationParameters.h264Surface = new H264Surface(configurationParameters);
                         }
 
@@ -258,13 +272,6 @@ public class Chimera extends AppCompatActivity {
                         configurationParameters.useAutoFocus = checkBoxAutoExposureFocus.isChecked();
                         configurationParameters.useOpticalStabilization = checkBoxOpticalStabilization.isChecked();
 
-//                        Runnable runnable = new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                nautobahn.simpleCameraModuleExternal = new SimpleCameraModule(externalConfigurationParameters);
-//                            }
-//                        };
-//                        Utils.post(workerHandler, runnable, true);
                         simpleCameraModuleExternal = new SimpleCameraModule(externalConfigurationParameters);
                     }
 
@@ -312,17 +319,8 @@ public class Chimera extends AppCompatActivity {
 
                     if (checkBoxInternalVideo.isChecked()) {
 
-                        try {
-                            internalConfigurationParameters = (ConfigurationParameters) ConfigurationParameters.DEFAULT_INTERNAL_CONFIGURATION_HD.clone();
-                        } catch (CloneNotSupportedException ex) {
-                            ex.printStackTrace();
-                        }
-
                         ConfigurationParameters configurationParameters = internalConfigurationParameters;
-                        configurationParameters.context = context;
-                        configurationParameters.activity = activity;
                         configurationParameters.useEncoder = checkBoxRecord.isChecked();
-                        configurationParameters.isExternal = false;
 
                         if (configurationParameters.useEncoder) {
                             configurationParameters.videoOutputDirectory = outputDirectory;
@@ -356,15 +354,6 @@ public class Chimera extends AppCompatActivity {
                         configurationParameters.useAutoFocus = checkBoxAutoExposureFocus.isChecked();
                         configurationParameters.useOpticalStabilization = checkBoxOpticalStabilization.isChecked();
 
-//                        Runnable runnable = new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                nautobahn.simpleCameraModuleInternal = new SimpleCameraModule(internalConfigurationParameters);
-//                            }
-//                        };
-//                        Utils.post(workerHandler, runnable, true);
-
-//                        runOnUiThread(runnable);
                         simpleCameraModuleInternal = new SimpleCameraModule(internalConfigurationParameters);
                     }
 

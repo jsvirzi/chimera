@@ -11,7 +11,7 @@ public class Common {
     public static final int DEFAULT_KEY_FRAMES_PER_FILE = 5;
     public static final int DEFAULT_KEY_FRAME_INTERVAL = 2;
     public static final int DEFAULT_FRAME_RATE_HD = 30;
-    public static final int DEFAULT_BIT_RATE_HD = 6000000;
+    public static final int DEFAULT_BIT_RATE_HD = 10000000;
     public static final int DEFAULT_FRAME_RATE_LD = 15;
     public static final int DEFAULT_BIT_RATE_LD = 2500000;
     public static final Locale LOCALE = Locale.US;
