@@ -30,19 +30,19 @@
 
                     <RelativeLayout
                         android:layout_width="240sp"
-                        android:layout_height="180sp">
+                        android:layout_height="135sp">
 
                         <!--<com.mam.lambo.CustomSurfaceView-->
                         <!--android:id="@+id/externalOverlay"-->
                         <!--android:layout_width="240sp"-->
-                        <!--android:layout_height="180sp"-->
+                        <!--android:layout_height="135sp"-->
                         <!--android:layout_alignParentLeft="true"-->
                         <!--/>-->
 
                         <SurfaceView
                             android:id="@+id/externalSurfaceView"
                             android:layout_width="240sp"
-                            android:layout_height="180sp"
+                            android:layout_height="135sp"
                             android:layout_alignParentLeft="true"
                             />
 
@@ -116,19 +116,19 @@
 
                     <RelativeLayout
                         android:layout_width="240sp"
-                        android:layout_height="180sp">
+                        android:layout_height="135sp">
 
                         <!--<com.mam.lambo.CustomSurfaceView-->
                         <!--android:id="@+id/internalOverlay"-->
                         <!--android:layout_width="240sp"-->
-                        <!--android:layout_height="180sp"-->
+                        <!--android:layout_height="135sp"-->
                         <!--android:layout_alignParentLeft="true"-->
                         <!--/>-->
 
                         <SurfaceView
                             android:id="@+id/internalSurfaceView"
                             android:layout_width="240sp"
-                            android:layout_height="180sp"
+                            android:layout_height="135sp"
                             android:layout_alignParentLeft="true"
                             />
 
