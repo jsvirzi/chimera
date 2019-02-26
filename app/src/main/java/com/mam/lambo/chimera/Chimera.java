@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.v7.app.AppCompatActivity;
@@ -179,7 +180,8 @@ public class Chimera extends AppCompatActivity {
         internalConfigurationParameters.isExternal = false;
         internalConfigurationParameters.activity = activity;
 
-        outputDirectory = getFilesDir().getAbsolutePath();
+        // outputDirectory = getFilesDir().getAbsolutePath();
+        outputDirectory = Environment.getExternalStorageDirectory().getAbsolutePath();
         String outputFilename = String.format("%s/sensor_data.csv", outputDirectory);
         final DataLogger dataLogger = DataLogger.getInstance(outputFilename);
 
@@ -243,13 +245,7 @@ public class Chimera extends AppCompatActivity {
                         if (configurationParameters.useEncoder) {
                             configurationParameters.videoOutputDirectory = outputDirectory;
                             configurationParameters.useH264 = checkBoxExternalEncodeH264.isChecked();
-                            if (configurationParameters.useH264) {
-                                configurationParameters.videoOutputFile = String.format("%s/%s_video.h264",
-                                        outputDirectory, configurationParameters.deviceName);
-                            } else {
-                                configurationParameters.videoOutputFile = String.format("%s/%s_video.mp4",
-                                        outputDirectory, configurationParameters.deviceName);
-                            }
+                            configurationParameters.videoOutputFile = String.format("%s/%s", outputDirectory, configurationParameters.deviceName);
                             configurationParameters.h264Surface = new H264Surface(configurationParameters);
                         }
 
@@ -325,13 +321,7 @@ public class Chimera extends AppCompatActivity {
                         if (configurationParameters.useEncoder) {
                             configurationParameters.videoOutputDirectory = outputDirectory;
                             configurationParameters.useH264 = checkBoxInternalEncodeH264.isChecked();
-                            if (configurationParameters.useH264) {
-                                configurationParameters.videoOutputFile = String.format("%s/%s_video.h264",
-                                        outputDirectory, configurationParameters.deviceName);
-                            } else {
-                                configurationParameters.videoOutputFile = String.format("%s/%s_video.mp4",
-                                        outputDirectory, configurationParameters.deviceName);
-                            }
+                            configurationParameters.videoOutputFile = String.format("%s/%s_", outputDirectory, configurationParameters.deviceName);
                             configurationParameters.h264Surface = new H264Surface(configurationParameters);
                         }
 

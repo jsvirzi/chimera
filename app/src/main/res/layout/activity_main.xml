@@ -209,7 +209,7 @@
                     android:layout_height="25sp"
                     android:text="record"
                     android:id="@+id/record"
-                    android:checked="false"
+                    android:checked="true"
                     />
 
                 <CheckBox

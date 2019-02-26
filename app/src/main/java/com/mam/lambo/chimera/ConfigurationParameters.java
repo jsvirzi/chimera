@@ -62,8 +62,10 @@ public class ConfigurationParameters implements Cloneable {
         this.deviceId = deviceId;
         if (deviceId == SimpleCameraModule.DeviceIdExternal) {
             deviceName = "external";
+            isExternal = true;
         } else if (deviceId == SimpleCameraModule.DeviceIdInternal) {
             deviceName = "internal";
+            isExternal = false;
         }
         useEncoder = true;
         if (useEncoder) {

@@ -36,10 +36,14 @@ public class H264Surface {
     private Handler backgroundHandler;
     private ConfigurationParameters configurationParameters;
     private final int MaxPayloadSize = 4 * 1024 * 1024;
-    private byte[] encodedDataBytes = new byte[MaxPayloadSize];
+    private byte[] encodedDataBuffer = new byte[MaxPayloadSize];
     private MediaCodec.Callback mediaCodecCallback;
-    private int framesProcessed = 0;
     private int frameCounter = 0;
+    private int framesProcessed = 0;
+    private int fileFrameCounter = 0;
+    private int fileKeyFrameCounter = 0;
+    private int keyFramesPerFile = 0;
+    private int fileCounter = 0;
     private MediaFormat mediaFormat;
     private MediaFormat outputMediaFormat = null;
     private MediaCodec encoder;
@@ -107,19 +111,39 @@ public class H264Surface {
         prepareEncoder(configurationParameters.imageWidth, configurationParameters.imageHeight,
             configurationParameters.bitRate, configurationParameters.frameRate);
 
-        if (configurationParameters.keyFramesPerFile == 0) {
-            bufferedOutputStreamH264 = null;
-            FileOutputStream fileOutputStream = null;
-            String filename = configurationParameters.videoOutputFile;
-            if (filename != null) {
-                try {
-                    fileOutputStream = new FileOutputStream(filename);
-                } catch (FileNotFoundException ex) {
-                    Log.d(TAG, "FileNotFoundException", ex);
-                }
-                bufferedOutputStreamH264 = new BufferedOutputStream(fileOutputStream, bufferSize);
+        bufferedOutputStreamH264 = null;
+    }
+
+    boolean prepareNextFile() {
+        if (bufferedOutputStreamH264 != null) {
+            try {
+                bufferedOutputStreamH264.close();
+                bufferedOutputStreamH264 = null;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
+        FileOutputStream fileOutputStream = null;
+        String filename = String.format(Common.LOCALE, "%s_%04d.h264", configurationParameters.videoOutputFile, fileCounter);
+        Log.d(TAG, String.format(Common.LOCALE, "new video file = [%s]", filename));
+        ++fileCounter;
+        if (filename != null) {
+            try {
+                fileOutputStream = new FileOutputStream(filename);
+            } catch (FileNotFoundException ex) {
+                Log.d(TAG, "FileNotFoundException", ex);
+                return false;
+            }
+            bufferedOutputStreamH264 = new BufferedOutputStream(fileOutputStream, bufferSize);
+            try {
+                bufferedOutputStreamH264.write(h264Header, 0, h264Header.length);
+                fileKeyFrameCounter = 0;
+                fileFrameCounter = 0;
+            } catch (IOException e) {
+                e.printStackTrace();;
+            }
+        }
+        return (bufferedOutputStreamH264 != null);
     }
 
     private MediaCodec.Callback mediaCodecCallbackH264 = new MediaCodec.Callback() {
@@ -138,7 +162,37 @@ public class H264Surface {
                 public void run() {
                     String msg;
 
+                    final boolean isConfig = ((info.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0);
                     ByteBuffer encodedData = codec.getOutputBuffer(index);
+                    if (isConfig) { /* trap h264 header */
+                        Log.d(TAG, "H264 header found. size = " + info.size);
+                        if (h264Header == null) {
+                            h264Header = new byte[info.size];
+                            encodedData.rewind();
+                            encodedData.get(h264Header, 0, info.size);
+                            prepareNextFile();
+                        } else {
+                            Log.d(TAG, "MediaCodec.BUFFER_FLAG_CODEC_CONFIG invoked again?");
+                        }
+                    }
+
+                    if (h264Header == null) {
+                        return; /* nothing to do until we get a header */
+                    }
+
+                    final boolean isKeyFrame = ((info.flags & MediaCodec.BUFFER_FLAG_KEY_FRAME) != 0);
+
+                    if (isKeyFrame) {
+                        Log.d(TAG, String.format(Common.LOCALE, "key frame %d at frame %d", fileKeyFrameCounter, fileFrameCounter));
+                    }
+
+                    if (isKeyFrame) {
+                        ++fileKeyFrameCounter;
+                        if (fileKeyFrameCounter == configurationParameters.keyFramesPerFile) {
+                            prepareNextFile();
+                        }
+                    }
+
                     if (bufferedOutputStreamH264 != null) {
                         int payloadSize = info.size;
                         if (payloadSize > MaxPayloadSize) {
@@ -146,29 +200,22 @@ public class H264Surface {
                             Log.d(TAG, msg);
                             payloadSize = MaxPayloadSize;
                         }
-                        encodedData.get(encodedDataBytes, info.offset, payloadSize);
                         try {
-                            bufferedOutputStreamH264.write(encodedDataBytes, info.offset, payloadSize);
+                            // byte[] encodedDataBuffer = new byte[info.size];
+                            encodedData.rewind();
+                            encodedData.get(encodedDataBuffer, info.offset, payloadSize);
+                            bufferedOutputStreamH264.write(encodedDataBuffer, 0, payloadSize);
+                            ++fileFrameCounter;
                             encodedSize += info.size;
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         }
 
-                        if ((info.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) { // trap h264 header
-                            Log.d(TAG, "size of header = " + info.size);
-                            if (h264Header == null) {
-                                h264Header = new byte[info.size];
-                                encodedData.rewind();
-                                encodedData.get(h264Header, 0, info.size);
-                            } else {
-                                Log.d(TAG, "MediaCodec.BUFFER_FLAG_CODEC_CONFIG invoked again?");
-                            }
-                        }
                     }
 
                     codec.releaseOutputBuffer(index, false);
 
-                    if ((info.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) == 0) {
+                    if (isConfig == false) {
                         ++framesProcessed;
                         if ((framesProcessed % 30) == 0) {
                             String logString = "SIZE = " + encodedSize + " FRAMES: " + framesProcessed;
